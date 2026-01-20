@@ -1,1 +1,33 @@
+body {
+  margin: 0;
+  background: black;
+  font-family: monospace;
+  color: #00ffcc;
+  overflow: hidden;
+}
+
+#screen {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  background: radial-gradient(#050505, #000);
+}
+
+#ui {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+
+button {
+  background: #111;
+  color: #00ffcc;
+  border: 1px solid #00ffcc;
+  margin: 5px;
+  padding: 10px;
+  cursor: pointer;
+}
 
