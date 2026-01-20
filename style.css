@@ -1,19 +1,34 @@
 body {
   margin: 0;
-  background: black;
   font-family: monospace;
   color: #00ffcc;
+  background: black;
   overflow: hidden;
 }
 
 #screen {
   width: 100vw;
   height: 100vh;
+  background: radial-gradient(circle at center, #050505 0%, #000 70%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 30px;
-  background: radial-gradient(#050505, #000);
+  transition: background 0.3s;
+}
+
+#screen.light-on {
+  background: radial-gradient(circle at center, #222 0%, #000 70%);
+}
+
+#screen.camera {
+  background: repeating-linear-gradient(
+    0deg,
+    #000,
+    #000 2px,
+    #050505 2px,
+    #050505 4px
+  );
 }
 
 #ui {
@@ -30,4 +45,3 @@ button {
   padding: 10px;
   cursor: pointer;
 }
-
