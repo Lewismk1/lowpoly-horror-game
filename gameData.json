@@ -1,1 +1,18 @@
+{
+  "player": {
+    "maxPower": 100
+  },
+  "enemy": {
+    "name": "The Watcher",
+    "speed": 0.15,
+    "aggression": 0.6,
+    "jumpscareDistance": 0
+  },
+  "powerDrain": {
+    "idle": 0.02,
+    "door": 0.2,
+    "camera": 0.15,
+    "light": 0.1
+  }
+}
 
