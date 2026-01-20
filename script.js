@@ -7,6 +7,8 @@ let camera = false;
 let light = false;
 let gameOver = false;
 
+const screen = document.getElementById("screen");
+
 fetch("gameData.json")
   .then(res => res.json())
   .then(json => {
@@ -30,14 +32,8 @@ function loop() {
 
   updateUI();
 
-  if (enemyDistance <= data.enemy.jumpscareDistance && !door) {
-    jumpscare();
-  }
-
-  if (power <= 0) {
-    power = 0;
-    jumpscare();
-  }
+  if (enemyDistance <= 0 && !door) jumpscare();
+  if (power <= 0) jumpscare();
 }
 
 function toggleDoor() {
@@ -47,34 +43,30 @@ function toggleDoor() {
 
 function toggleCamera() {
   camera = !camera;
+  screen.classList.toggle("camera", camera);
   flash(camera ? "CAMERA FEED" : "OFFICE");
 }
 
 function toggleLight() {
   light = !light;
-  flash(light ? "LIGHT ON" : "LIGHT OFF");
+  screen.classList.toggle("light-on", light);
 }
 
 function updateUI() {
   document.getElementById("power").innerText =
     "Power: " + Math.max(0, power.toFixed(0)) + "%";
-
-  document.getElementById("status").innerText =
-    enemyDistance < 40 ? "Status: DANGER" : "Status: Calm";
 }
 
 function flash(text) {
-  document.getElementById("screen").innerText = text;
+  screen.innerText = text;
   setTimeout(() => {
-    document.getElementById("screen").innerText =
-      camera ? "CAMERA FEED" : "OFFICE";
+    screen.innerText = camera ? "CAMERA FEED" : "OFFICE";
   }, 400);
 }
 
 function jumpscare() {
   gameOver = true;
+  screen.innerText = "YOU WERE TOO LATE";
   document.body.style.background = "darkred";
-  document.getElementById("screen").innerText = "YOU SHOULD NOT HAVE LOOKED";
   setTimeout(() => location.reload(), 3000);
 }
-
