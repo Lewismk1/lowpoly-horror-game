@@ -1,72 +1,91 @@
-let data;
+let scene, camera, renderer;
+let light;
+let enemy;
 let power = 100;
-let enemyDistance = 100;
+let cameraMode = false;
 
-let door = false;
-let camera = false;
-let light = false;
-let gameOver = false;
+init();
+animate();
 
-const screen = document.getElementById("screen");
+function init() {
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x000000);
 
-fetch("gameData.json")
-  .then(res => res.json())
-  .then(json => {
-    data = json;
-    startGame();
+  camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
+  camera.position.set(0, 1.6, 5);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // ROOM
+  const roomGeo = new THREE.BoxGeometry(10, 5, 10);
+  const roomMat = new THREE.MeshStandardMaterial({
+    color: 0x111111,
+    side: THREE.BackSide
   });
+  const room = new THREE.Mesh(roomGeo, roomMat);
+  scene.add(room);
 
-function startGame() {
-  setInterval(loop, 100);
+  // LIGHT
+  light = new THREE.PointLight(0xffffff, 1, 20);
+  light.position.set(0, 3, 0);
+  scene.add(light);
+
+  // FLOOR
+  const floorGeo = new THREE.PlaneGeometry(10, 10);
+  const floorMat = new THREE.MeshStandardMaterial({ color: 0x080808 });
+  const floor = new THREE.Mesh(floorGeo, floorMat);
+  floor.rotation.x = -Math.PI / 2;
+  scene.add(floor);
+
+  // ENEMY (LOW POLY)
+  const enemyGeo = new THREE.BoxGeometry(1, 2, 1);
+  const enemyMat = new THREE.MeshStandardMaterial({ color: 0x550000 });
+  enemy = new THREE.Mesh(enemyGeo, enemyMat);
+  enemy.position.set(0, 1, -4);
+  scene.add(enemy);
+
+  window.addEventListener("resize", onResize);
 }
 
-function loop() {
-  if (gameOver) return;
+function animate() {
+  requestAnimationFrame(animate);
 
-  power -= data.powerDrain.idle;
-  if (door) power -= data.powerDrain.door;
-  if (camera) power -= data.powerDrain.camera;
-  if (light) power -= data.powerDrain.light;
+  // Enemy slowly approaches
+  enemy.position.z += 0.005;
 
-  enemyDistance -= data.enemy.speed * (1 + Math.random() * data.enemy.aggression);
+  // Jumpscare trigger
+  if (enemy.position.z > 1) {
+    document.body.style.background = "darkred";
+    alert("YOU WERE CAUGHT");
+    location.reload();
+  }
 
-  updateUI();
+  // Power drain
+  power -= cameraMode ? 0.05 : 0.01;
+  document.getElementById("power").innerText =
+    "Power: " + Math.max(0, power.toFixed(0)) + "%";
 
-  if (enemyDistance <= 0 && !door) jumpscare();
-  if (power <= 0) jumpscare();
-}
-
-function toggleDoor() {
-  door = !door;
-  flash(door ? "DOOR CLOSED" : "DOOR OPEN");
-}
-
-function toggleCamera() {
-  camera = !camera;
-  screen.classList.toggle("camera", camera);
-  flash(camera ? "CAMERA FEED" : "OFFICE");
+  renderer.render(scene, camera);
 }
 
 function toggleLight() {
-  light = !light;
-  screen.classList.toggle("light-on", light);
+  light.visible = !light.visible;
 }
 
-function updateUI() {
-  document.getElementById("power").innerText =
-    "Power: " + Math.max(0, power.toFixed(0)) + "%";
+function toggleCamera() {
+  cameraMode = !cameraMode;
+  camera.position.z = cameraMode ? -2 : 5;
 }
 
-function flash(text) {
-  screen.innerText = text;
-  setTimeout(() => {
-    screen.innerText = camera ? "CAMERA FEED" : "OFFICE";
-  }, 400);
-}
-
-function jumpscare() {
-  gameOver = true;
-  screen.innerText = "YOU WERE TOO LATE";
-  document.body.style.background = "darkred";
-  setTimeout(() => location.reload(), 3000);
+function onResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
 }
